@@ -1,0 +1,8 @@
+{
+  "name": "ChatAi",
+  "description": "A comprehensive AI suite featuring real-time voice interaction, image generation, video creation, and advanced multimodal chat powered by ChatAi.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
