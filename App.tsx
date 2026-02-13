@@ -10,7 +10,7 @@ import { ToolType } from './types.ts';
 const App: React.FC = () => {
   const [activeTool, setActiveTool] = useState<ToolType>(ToolType.CHAT);
   
-  // Persistent Global State with safety checks
+  // Persistent Global State with safety checks for GitHub Pages environment
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
     try {
       return localStorage.getItem('isLoggedIn') === 'true';
@@ -25,7 +25,6 @@ const App: React.FC = () => {
       if (!saved || saved === 'undefined' || saved === 'null') return null;
       return JSON.parse(saved);
     } catch (e) {
-      console.warn("Failed to parse userProfile from localStorage", e);
       return null;
     }
   });
@@ -46,32 +45,22 @@ const App: React.FC = () => {
       } else {
         localStorage.removeItem('userProfile');
       }
-    } catch (e) {
-      console.warn("Failed to save to localStorage", e);
-    }
+    } catch (e) {}
   }, [isLoggedIn, userProfile]);
 
   useEffect(() => {
     try {
       localStorage.setItem('imageCount', imageCount.toString());
-    } catch (e) {
-      console.warn("Failed to save imageCount", e);
-    }
+    } catch (e) {}
   }, [imageCount]);
 
   const handleLogout = () => {
     setIsLoggedIn(false);
     setUserProfile(null);
-    try {
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userProfile');
-    } catch (e) {}
   };
 
   const handleLogin = () => {
     const simulatedCode = "134";
-    
-    // Generate random user data for the session
     const firstNames = ["Nova", "Luna", "Astra", "Zephyr", "Kael", "Mira", "Orion", "Lyra"];
     const lastNames = ["Pulse", "Stellar", "Void", "Cloud", "Shadow", "Light", "Echo", "Drift"];
     const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
@@ -90,146 +79,52 @@ const App: React.FC = () => {
           <title>Sign up</title>
           <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
           <style>
-            body { 
-              background: #ffffff; 
-              font-family: 'Inter', sans-serif; 
-              display: flex; 
-              flex-direction: column; 
-              align-items: center; 
-              justify-content: center; 
-              min-height: 100vh; 
-              margin: 0;
-              color: #111111;
-              padding: 20px;
-            }
-            .container {
-              width: 100%;
-              max-width: 440px;
-              text-align: center;
-              transition: opacity 0.3s ease;
-            }
+            body { background: #ffffff; font-family: 'Inter', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; color: #111111; padding: 20px; }
+            .container { width: 100%; max-width: 440px; text-align: center; }
             .hidden { display: none !important; }
             h1 { font-size: 36px; font-weight: 700; margin-bottom: 40px; color: #1a1a1a; letter-spacing: -0.02em; }
-            .card {
-              background: white; border: 1px solid #e5e7eb; border-radius: 20px;
-              padding: 36px; text-align: left; box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            }
-            .label { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: block; color: #111111; }
-            input[type="email"], input[type="text"] {
-              width: 100%; padding: 14px 18px; border: 1px solid #d1d5db; border-radius: 10px;
-              font-size: 16px; box-sizing: border-box; margin-bottom: 30px; outline: none;
-            }
-            input:focus { border-color: #000; }
-            .btn-black {
-              width: 100%; background: #000; color: white; padding: 16px; border-radius: 10px;
-              font-weight: 600; font-size: 16px; border: none; cursor: pointer; margin-bottom: 12px;
-            }
-            .divider { display: flex; align-items: center; margin: 32px 0; color: #6b7280; font-size: 13px; font-weight: 500; }
-            .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: #e5e7eb; }
-            .divider span { margin: 0 18px; }
-            .social-btn {
-              width: 100%; padding: 14px; border: 1px solid #d1d5db; background: white; border-radius: 10px;
-              font-weight: 500; font-size: 15px; display: flex; align-items: center; justify-content: center;
-              margin-bottom: 14px; cursor: pointer; gap: 12px; color: #1f2937;
-            }
-            .social-btn img { width: 20px; height: 20px; }
-            .tos-footer { margin-top: 80px; font-size: 13px; color: #6b7280; line-height: 1.6; max-width: 320px; }
+            .card { background: white; border: 1px solid #e5e7eb; border-radius: 20px; padding: 36px; text-align: left; }
+            .label { font-size: 15px; font-weight: 600; margin-bottom: 12px; display: block; }
+            input { width: 100%; padding: 14px 18px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; box-sizing: border-box; margin-bottom: 30px; outline: none; }
+            .btn-black { width: 100%; background: #000; color: white; padding: 16px; border-radius: 10px; font-weight: 600; font-size: 16px; border: none; cursor: pointer; }
             .otp-inputs { display: flex; gap: 15px; justify-content: center; margin: 30px 0; }
-            .otp-input {
-              width: 60px; height: 75px; border: 1px solid #d1d5db; border-radius: 12px;
-              text-align: center; font-size: 32px; font-weight: 700; outline: none;
-              box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-            }
-            .otp-input:focus { border-color: #000; border-width: 2px; }
-            #loading-overlay {
-              position: fixed; inset: 0; background: white; display: none;
-              flex-direction: column; align-items: center; justify-content: center; z-index: 100;
-            }
-            .spinner {
-              width: 32px; height: 32px; border: 3px solid #f3f3f3; border-top: 3px solid #000;
-              border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px;
-            }
-            @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-            .error-msg { color: #ef4444; font-size: 13px; text-align: center; margin-top: -20px; margin-bottom: 20px; display: none; font-weight: 500; }
+            .otp-input { width: 60px; height: 75px; border: 1px solid #d1d5db; border-radius: 12px; text-align: center; font-size: 32px; font-weight: 700; }
           </style>
         </head>
         <body>
-          <div id="loading-overlay">
-            <div class="spinner"></div>
-            <p style="font-weight: 500; font-size: 14px; color: #4b5563;">Processing...</p>
-          </div>
-
           <div class="container" id="step-1">
             <h1>Sign up</h1>
             <div class="card">
               <label class="label">Email</label>
               <input type="email" placeholder="Your email address" id="email-input">
               <button class="btn-black" onclick="sendCode()">Continue</button>
-              <div class="divider"><span>OR</span></div>
-              <button class="social-btn" onclick="sendCode()">
-                <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google">
-                Continue with Google
-              </button>
             </div>
-            <p class="tos-footer">By creating an account, you agree to the <br> Terms of Service and Privacy Policy</p>
           </div>
-
           <div class="container hidden" id="step-2">
             <h1>Verify Code</h1>
             <div class="card">
-              <p style="font-size: 14px; color: #6b7280; margin-bottom: 24px; text-align: center;">
-                Enter the 3-digit code sent to your Gmail.
-              </p>
               <div class="otp-inputs">
-                <input type="text" maxlength="1" class="otp-input" id="o1" oninput="digitInput(this, 'o2')">
-                <input type="text" maxlength="1" class="otp-input" id="o2" oninput="digitInput(this, 'o3')">
+                <input type="text" maxlength="1" class="otp-input" id="o1" oninput="if(this.value)document.getElementById('o2').focus()">
+                <input type="text" maxlength="1" class="otp-input" id="o2" oninput="if(this.value)document.getElementById('o3').focus()">
                 <input type="text" maxlength="1" class="otp-input" id="o3">
               </div>
-              <div id="error-msg" class="error-msg">Incorrect code. Use "134" to verify.</div>
               <button class="btn-black" onclick="verifyOTP()">Verify & Sign Up</button>
             </div>
           </div>
-
           <script>
-            const CORRECT_CODE = "${simulatedCode}";
-            const PROFILE_DATA = ${JSON.stringify({ name: randomName, email: randomEmail, initials, avatar })};
-            
             function sendCode() {
-              document.getElementById('loading-overlay').style.display = 'flex';
-              setTimeout(() => {
-                alert("Gmail Notification:\\nYour ChatAi verification code is: " + CORRECT_CODE);
-                document.getElementById('loading-overlay').style.display = 'none';
-                document.getElementById('step-1').classList.add('hidden');
-                document.getElementById('step-2').classList.remove('hidden');
-                document.getElementById('o1').focus();
-              }, 1200);
+              alert("Your ChatAi verification code is: ${simulatedCode}");
+              document.getElementById('step-1').classList.add('hidden');
+              document.getElementById('step-2').classList.remove('hidden');
             }
-
-            function digitInput(current, nextID) {
-              if (current.value.length >= 1) document.getElementById(nextID).focus();
-            }
-
             function verifyOTP() {
-              const enteredCode = 
-                document.getElementById('o1').value + 
-                document.getElementById('o2').value + 
-                document.getElementById('o3').value;
-
-              if (enteredCode === CORRECT_CODE) {
-                document.getElementById('loading-overlay').style.display = 'flex';
-                setTimeout(() => {
-                   window.opener.postMessage({ type: 'auth_success', profile: PROFILE_DATA }, '*');
-                   window.close();
-                }, 1000);
-              } else {
-                document.getElementById('error-msg').style.display = 'block';
-                const card = document.querySelector('#step-2 .card');
-                card.style.transform = 'translateX(10px)';
-                setTimeout(() => card.style.transform = 'translateX(-10px)', 50);
-                setTimeout(() => card.style.transform = 'translateX(0)', 100);
-              }
+              const code = document.getElementById('o1').value + document.getElementById('o2').value + document.getElementById('o3').value;
+              if (code === "${simulatedCode}") {
+                window.opener.postMessage({ type: 'auth_success', profile: ${JSON.stringify({ name: randomName, email: randomEmail, initials, avatar })} }, '*');
+                window.close();
+              } else { alert("Incorrect code. Use ${simulatedCode}"); }
             }
-          <\/script>
+          </script>
         </body>
         </html>
       `);
@@ -240,10 +135,9 @@ const App: React.FC = () => {
       if (event.data?.type === 'auth_success') {
         setIsLoggedIn(true);
         setUserProfile(event.data.profile);
-        window.removeEventListener('message', handleAuthMessage);
       }
     };
-    window.addEventListener('message', handleAuthMessage);
+    window.addEventListener('message', handleAuthMessage, { once: true });
   };
 
   const renderContent = () => {
